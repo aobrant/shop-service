@@ -125,4 +125,3 @@ class ConfirmEmailToken(models.Model):
     def __str__(self):
         return "Password reset token for user {user}".format(user=self.user)
 
-# Create your models here.

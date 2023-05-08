@@ -44,7 +44,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = 'Category'
-        verbose_name_plural = 'categories‹'
+        verbose_name_plural = 'categories'
         ordering = ('-name',)
 
     def __str__(self):
@@ -67,6 +67,7 @@ class Product(models.Model):
 
 class ProductInfo(models.Model):
     model = models.CharField(max_length=100, verbose_name='Model')
+    external_id = models.PositiveIntegerField(verbose_name='External id')
     quantity = models.PositiveIntegerField(verbose_name='Quantity')
     price = models.PositiveIntegerField(verbose_name='Price')
     price_rrc = models.PositiveIntegerField(verbose_name='Recommended retail price')
