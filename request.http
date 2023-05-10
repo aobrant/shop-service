@@ -1,0 +1,14 @@
+### POST
+
+POST http://127.0.0.1:8000/api/v1/partner/update
+Content-Type: application/json
+Authorization: Token 9f73f7059de97c574c0fe214cb6be7c802370860
+
+{
+"url": "https://disk.yandex.ru/d/GSS0B_D1ysbvwQ"
+}
+
+### LOCAL POST
+
+POST http://127.0.0.1:8000/api/v1/partner/update/local
+
