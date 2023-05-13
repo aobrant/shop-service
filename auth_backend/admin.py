@@ -8,7 +8,7 @@ from auth_backend.models import User, ConfirmEmailToken
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     """
-    Панель управления пользователями
+    User Control Panel
     """
     model = User
 

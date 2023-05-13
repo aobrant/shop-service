@@ -135,6 +135,14 @@ AUTH_USER_MODEL = "auth_backend.User"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = 'aobrant@mail.ru'
+EMAIL_HOST_PASSWORD = '12345'
+EMAIL_PORT = '465'
+EMAIL_USE_SSL = True
+SERVER_EMAIL = EMAIL_HOST_USER
+
 REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (

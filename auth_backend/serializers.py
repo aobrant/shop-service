@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
 from auth_backend.models import User, Contact
-from backend.serializers import ContactSerializer
 
+
+# from backend.serializers import ContactSerializer
 
 
 class ContactSerializer(serializers.ModelSerializer):
