@@ -26,7 +26,7 @@ from backend.models import Shop, Category, ProductInfo, Product, ProductParamete
 from backend.serializers import CategorySerializer, ShopSerializer, ProductInfoSerializer, OrderSerializer, \
     OrderItemSerializer
 from backend.signals import new_user_registered, new_order
-from backend.utils import oder_ser, import_partner
+from backend.tasks import oder_ser, import_partner
 
 
 # Create your views here.

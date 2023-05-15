@@ -12,3 +12,8 @@ services:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: shop_service
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

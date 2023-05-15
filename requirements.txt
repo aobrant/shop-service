@@ -7,3 +7,5 @@ ujson
 requests
 python-decouple
 django-rest-passwordreset
+celery
+redis

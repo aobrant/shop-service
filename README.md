@@ -48,6 +48,13 @@ Create a superuser
 
 python manage.py createsuperuser
 
+Run bases
+docker-compose up
+
+Run Celery
+celery -A orders worker -l info
+
+
 Command to run the application
 
 python manage.py runserver
