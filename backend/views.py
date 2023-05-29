@@ -28,6 +28,9 @@ from backend.serializers import CategorySerializer, ShopSerializer, ProductInfoS
 from backend.signals import new_user_registered, new_order
 from backend.tasks import oder_ser, import_partner
 
+from rest_framework.viewsets import ViewSet, GenericViewSet
+from rest_framework.decorators import action
+
 
 # Create your views here.
 def index(request):
@@ -37,42 +40,18 @@ def index(request):
     return render(request, 'index.html')
 
 
-# def import_partner(data):
-#     shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
-#     for category in data['categories']:
-#         category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
-#         category_object.shops.add(shop.id)
-#         category_object.save()
-#     ProductInfo.objects.filter(shop_id=shop.id).delete()
-#     for item in data['goods']:
-#         product, _ = Product.objects.get_or_create(name=item['name'], category_id=item['category'])
-#
-#         product_info = ProductInfo.objects.create(product_id=product.id,
-#                                                   external_id=item['id'],
-#                                                   model=item['model'],
-#                                                   price=item['price'],
-#                                                   price_rrc=item['price_rrc'],
-#                                                   quantity=item['quantity'],
-#                                                   shop_id=shop.id)
-#         for name, value in item['parameters'].items():
-#             parameter_object, _ = Parameter.objects.get_or_create(name=name)
-#             ProductParameter.objects.create(product_info_id=product_info.id,
-#                                             parameter_id=parameter_object.id,
-#                                             value=value)
-#         return
-#
-
-class PartnerUpdate(APIView):
+class PartnerViewset(ViewSet):
     """
-    Class for updating the price list from the supplier
+    Viewset for updating the price list from the supplier
     """
 
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def update_price_list(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
         if request.user.type != 'shop':
-            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Only for shops'}, status=403)
 
         url = request.data.get('url')
 
@@ -91,31 +70,29 @@ class PartnerUpdate(APIView):
                 # return JsonResponse({'Status': True})
                 return HttpResponse(json.dumps({'Status': True}), content_type='application/json')
 
-        # return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+        # return JsonResponse({'Status': False, 'Errors': 'Not all required arguments  provided'})
         return HttpResponse(json.dumps({'Status': False, 'Errors': 'Not all required arguments not provided'}),
                             content_type='application/json')
 
-
-class LocalPartnerUpdate(APIView):
     """
         Class for updating the price from the supplier through a local file in the folder fixtures
-        """
+    """
 
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def partner_update_local(self, request, *args, **kwargs):
         file_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'shop1.yaml')
         with open(file_path, 'r') as stream:
             data = yaml.safe_load(stream)
         import_partner(data)
         return HttpResponse(json.dumps({'Status': True}), content_type='application/json')
 
-
-class PartnerState(APIView):
     """
-    Class for working with supplier status
+    working with supplier status
     """
 
     # get current status
-    def get(self, request, *args, **kwargs):
+    @action(detail=False, methods=['get'])
+    def get_partner_state(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -127,7 +104,8 @@ class PartnerState(APIView):
         return Response(serializer.data)
 
     # change current status
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def change_status(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -143,13 +121,12 @@ class PartnerState(APIView):
 
         return JsonResponse({'Status': False, 'Errors': 'Not all required arguments not provided'})
 
-
-class PartnerOrders(APIView):
     """
-    Class for receiving orders by suppliers
+    receiving orders by suppliers
     """
 
-    def get(self, request, *args, **kwargs):
+    @action(detail=False, methods=['get'])
+    def list_of_orders(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -160,13 +137,14 @@ class PartnerOrders(APIView):
         return Response(serializer_data)
 
 
-class RegisterAccount(APIView):
+class AccountViewSet(GenericViewSet):
     """
-    To register buyers
+    Class for working with user accounts
     """
 
     # Registration method POST
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def register(self, request, *args, **kwargs):
 
         # checking required arguments
         if {'first_name', 'last_name', 'email', 'password', 'company', 'position'}.issubset(request.data):
@@ -205,14 +183,13 @@ class RegisterAccount(APIView):
 
         return JsonResponse({'Status': False, 'Errors': 'Not all required arguments not provided'})
 
-
-class ConfirmAccount(APIView):
     """
-    Class for validating an email address
+    validating an email address
     """
 
     # Registration method POST
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def confirm(self, request, *args, **kwargs):
 
         # checking required arguments
         if {'email', 'token'}.issubset(request.data):
@@ -229,14 +206,13 @@ class ConfirmAccount(APIView):
 
         return JsonResponse({'Status': False, 'Errors': 'Not all required arguments not provided'})
 
-
-class AccountDetails(APIView):
     """
-    Class for working with user data
+    working with user data
     """
 
     # to get data
-    def get(self, request, *args, **kwargs):
+    @action(detail=False, methods=['get'])
+    def details(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -244,7 +220,8 @@ class AccountDetails(APIView):
         return Response(serializer.data)
 
     # Editing method POST
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def update_account(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
         # checking required arguments
@@ -271,14 +248,13 @@ class AccountDetails(APIView):
         else:
             return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
 
-
-class ContactView(APIView):
     """
-    Class for working with customer contacts
+    working with customer contacts
     """
 
     # get contacts
-    def get(self, request, *args, **kwargs):
+    @action(detail=False, methods=['get'])
+    def get_contact(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
         contact = Contact.objects.filter(
@@ -287,7 +263,8 @@ class ContactView(APIView):
         return Response(serializer.data)
 
     # add new contact
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def add_contact(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -305,8 +282,8 @@ class ContactView(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Not all required arguments not provided'})
 
     # delete contact
-
-    def delete(self, request, *args, **kwargs):
+    @action(detail=False, methods=['delete'])
+    def delete_contact(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -325,14 +302,13 @@ class ContactView(APIView):
                 return JsonResponse({'Status': True, 'Objects removed': deleted_count})
         return JsonResponse({'Status': False, 'Errors': 'Not all required arguments not provided'})
 
-
-class LoginAccount(APIView):
     """
     Class for user authorization
     """
 
     # Method authorization POST
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def login(self, request, *args, **kwargs):
 
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request, username=request.data['email'], password=request.data['password'])
