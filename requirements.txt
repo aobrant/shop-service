@@ -9,3 +9,4 @@ python-decouple
 django-rest-passwordreset
 celery
 redis
+drf-spectacular

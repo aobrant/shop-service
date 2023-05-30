@@ -4,6 +4,7 @@ from django_rest_passwordreset.tokens import get_token_generator
 from django.db import models
 
 
+
 USER_TYPE_CHOICES = (
     ('shop', 'Shop'),
     ('buyer', 'Buyer'),
