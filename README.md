@@ -60,6 +60,8 @@ Command to run the application
 python manage.py runserver
 
 The application will be available at: http://127.0.0.1:8000/`
+At api/schema/, a JSON schema of API will be generated, 
+from which Swagger-UI documentation will be built at api/docs/.
 
-
+http://127.0.0.1:8000/api/docs/ you will see a list of endpoints
 

@@ -4,9 +4,9 @@ django-rest-passwordreset
 psycopg2-binary
 pyyaml
 ujson
-requests
+requests==2.31.0
 python-decouple
-django-rest-passwordreset
 celery
 redis
 drf-spectacular
+coverage
